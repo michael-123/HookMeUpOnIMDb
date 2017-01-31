@@ -11,7 +11,7 @@ def log_me(message):
         print(message)
 
 
-def get_ratings_movie_ids(user):
+def get_ratings(user):
     """
     Gets you all movie ids from the ratings list (must be public) for a given user.
     :param user: IMDb User ID
@@ -35,7 +35,7 @@ def get_ratings_movie_ids(user):
         return list(res)
 
     rating_ids = []
-    url = 'http://www.imdb.com/user/ur{0}/ratings?start={1}&view=detail&sort=ratings_date:desc'.format(user, "{0}")
+    url = 'http://www.imdb.com/user/{0}/ratings?start={1}&view=detail&sort=ratings_date:desc'.format(user, "{0}")
     counter_list = get_counter_list()
 
     # Get all movie ids from rating list
@@ -64,6 +64,7 @@ def write_html_file(path, rating, content):
 
 
 def download_html_for_movie_ids(movie_ids, path):
+    # url = 'http://www.imdb.com/list/export?list_id=ratings&author_id=ur24735567'
     """
     Downloads for a list of movie ids the html code and saves it to the local disk.
     :param movie_ids:
@@ -78,14 +79,23 @@ def download_html_for_movie_ids(movie_ids, path):
         write_html_file(path, id, r.text)
 
 
-def download_imdb_data(user_id, path):
+def get_watchlist(user_id, watchlist_id):
+    url = 'http://www.imdb.com/list/export?list_id={0}&author_id=ur{1}'
+    # TODO download watchlist (CSV)
+    pass
+
+
+def download_imdb_data(user_id, path, watchlist_id):
     # Get Ratings
-    rating_ids = get_ratings_movie_ids(user_id)
+    #rating_ids = get_ratings(user_id)
 
     # Download HTML code
     download_html_for_movie_ids(rating_ids, path+"/ratings")
 
     # Get Watchlist
+    watchlist_ids = get_watchlist(user_id, watchlist_id)
+
+
     # Download HTML code
 
     # Get Reccomendations for Watchlist/Ratings
@@ -98,9 +108,11 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument("-user", "--user", required=True)
     p.add_argument("-path", "--path", required=True)
+    p.add_argument("-wlid", "--wlid", required=True)
     args = p.parse_args()
 
     user = args.user
     path = args.path
+    watchlist_id = args.wlid
 
-    download_imdb_data(user, path)
+    download_imdb_data(user, path, watchlist_id)

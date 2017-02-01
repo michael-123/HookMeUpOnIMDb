@@ -59,7 +59,7 @@ def write_html_file(path, rating, content):
 
     out = path + "/" + rating + ".html"
     log_me("Writing {0}".format(out))
-    with open(out, "w") as file:
+    with open(out, "w", encoding="utf8") as file:
         file.write(content)
 
 
@@ -88,6 +88,37 @@ def get_ids_from_csv_file(file_path):
                 result.append(row[1])
     return result
 
+def get_recommendation_ids_for_movies(path, subfolder):
+
+    def get_recomendation_ids_from_html_file(open_path, html_file):
+        result = []
+
+        print(open_path+"\\"+html_file)
+        with open(open_path+"\\"+html_file, "r", encoding="utf8") as f:
+            html_code = f.read()
+            tree = html.fromstring(html_code)
+            recommendations = tree.xpath('//div[@class="rec_item"]')
+
+            for rec in recommendations:
+                s = rec.xpath("a/@href")[0]
+                id = s[7:-17]
+                result.append(id)
+
+        return result
+
+    sub_path = path+"\\"+subfolder
+    movie_ids = []
+
+    for filename in os.listdir(sub_path):
+        if filename.endswith(".html"):
+            ids = get_recomendation_ids_from_html_file(sub_path, filename)
+            movie_ids.extend(ids)
+            continue
+        else:
+            continue
+
+    return movie_ids
+
 
 def download_imdb_data(user_id, path, watchlist_id):
     # Get Ratings
@@ -95,14 +126,14 @@ def download_imdb_data(user_id, path, watchlist_id):
     # download_html_for_movie_ids(rating_ids, path+"/ratings")
 
     # Get Watchlist
-    watchlist_ids = get_ids_from_csv_file(path+"/watchlist.csv")
-    download_html_for_movie_ids(watchlist_ids, path+"/watchlist")
-
-
-    # Download HTML code
+    # watchlist_ids = get_ids_from_csv_file(path+"/watchlist.csv")
+    # download_html_for_movie_ids(watchlist_ids, path+"/watchlist")
 
     # Get Reccomendations for Watchlist/Ratings
-    # Download HTML code
+    watchlist_ids = get_recommendation_ids_for_movies(path, "watchlist")
+    rating_ids = get_recommendation_ids_for_movies(path, "ratings")
+    download_html_for_movie_ids(watchlist_ids, "imdb")
+    download_html_for_movie_ids(rating_ids, "imdb")
 
 
 if __name__ == '__main__':
@@ -117,5 +148,7 @@ if __name__ == '__main__':
     user = args.user
     path = args.path
     watchlist_id = args.wlid
+
+    path = "C:\\Users\\MEichenseer\\Documents\\GitHub\\HookMeUpOnIMDb-Data"
 
     download_imdb_data(user, path, watchlist_id)

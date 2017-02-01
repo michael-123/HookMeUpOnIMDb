@@ -1,5 +1,5 @@
 import os
-
+import csv
 import requests
 from lxml import html
 
@@ -64,7 +64,7 @@ def write_html_file(path, rating, content):
 
 
 def download_html_for_movie_ids(movie_ids, path):
-    # url = 'http://www.imdb.com/list/export?list_id=ratings&author_id=ur24735567'
+    # url = 'http://www.imdb.com/list/export?list_id=ratings&author_id={0}
     """
     Downloads for a list of movie ids the html code and saves it to the local disk.
     :param movie_ids:
@@ -79,21 +79,24 @@ def download_html_for_movie_ids(movie_ids, path):
         write_html_file(path, id, r.text)
 
 
-def get_watchlist(user_id, watchlist_id):
-    url = 'http://www.imdb.com/list/export?list_id={0}&author_id=ur{1}'
-    # TODO download watchlist (CSV)
-    pass
+def get_ids_from_csv_file(file_path):
+    result = []
+    with open(file_path, 'r') as file:
+        rows = csv.reader(file, delimiter=',', quotechar='"')
+        for row in rows:
+            if row is not 'const':
+                result.append(row[1])
+    return result
 
 
 def download_imdb_data(user_id, path, watchlist_id):
     # Get Ratings
-    #rating_ids = get_ratings(user_id)
-
-    # Download HTML code
-    download_html_for_movie_ids(rating_ids, path+"/ratings")
+    # rating_ids = get_ratings(user_id)
+    # download_html_for_movie_ids(rating_ids, path+"/ratings")
 
     # Get Watchlist
-    watchlist_ids = get_watchlist(user_id, watchlist_id)
+    watchlist_ids = get_ids_from_csv_file(path+"/watchlist.csv")
+    download_html_for_movie_ids(watchlist_ids, path+"/watchlist")
 
 
     # Download HTML code

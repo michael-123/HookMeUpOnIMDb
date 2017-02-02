@@ -93,8 +93,8 @@ def get_recommendation_ids_for_movies(path, subfolder):
     def get_recomendation_ids_from_html_file(open_path, html_file):
         result = []
 
-        print(open_path+"\\"+html_file)
-        with open(open_path+"\\"+html_file, "r", encoding="utf8") as f:
+        print(open_path+"/"+html_file)
+        with open(open_path+"/"+html_file, "r", encoding="utf8") as f:
             html_code = f.read()
             tree = html.fromstring(html_code)
             recommendations = tree.xpath('//div[@class="rec_item"]')
@@ -106,7 +106,7 @@ def get_recommendation_ids_for_movies(path, subfolder):
 
         return result
 
-    sub_path = path+"\\"+subfolder
+    sub_path = path+"/"+subfolder
     movie_ids = []
 
     for filename in os.listdir(sub_path):
@@ -118,6 +118,13 @@ def get_recommendation_ids_for_movies(path, subfolder):
             continue
 
     return movie_ids
+
+
+def get_already_there(path):
+    result = []
+    for filename in os.listdir(path):
+        result.append(filename[:-5])
+    return result
 
 
 def download_imdb_data(user_id, path, watchlist_id):
@@ -132,8 +139,51 @@ def download_imdb_data(user_id, path, watchlist_id):
     # Get Reccomendations for Watchlist/Ratings
     watchlist_ids = get_recommendation_ids_for_movies(path, "watchlist")
     rating_ids = get_recommendation_ids_for_movies(path, "ratings")
-    download_html_for_movie_ids(watchlist_ids, "imdb")
-    download_html_for_movie_ids(rating_ids, "imdb")
+
+#    2787
+#    7935
+
+    already_loaded = get_already_there("imdb")
+
+    filtered_wids = list(filter(lambda x: x not in already_loaded, watchlist_ids))
+    filtered_rids = list(filter(lambda x: x not in already_loaded, rating_ids))
+
+    #download_html_for_movie_ids(watchlist_ids, "imdb")
+    download_html_for_movie_ids(filtered_rids, "imdb")
+
+def download_relationships_as_csv(path):
+    def get_recommendation_ids_for_movies(path, subfolder):
+        def get_recomendation_ids_from_html_file(open_path, html_file):
+            result = []
+            with open(open_path + "/" + html_file, "r", encoding="utf8") as f:
+                html_code = f.read()
+                tree = html.fromstring(html_code)
+                recommendations = tree.xpath('//div[@class="rec_item"]')
+
+                for rec in recommendations:
+                    s = rec.xpath("a/@href")[0]
+                    id = s[7:-17]
+                    result.append(id)
+
+            return result
+
+        sub_path = path + "/" + subfolder
+
+        for filename in os.listdir(sub_path):
+            if filename.endswith(".html"):
+                ids = get_recomendation_ids_from_html_file(sub_path, filename)
+                result_dict[filename[:-5]] = ids
+                continue
+            else:
+                continue
+
+    result_dict = {}
+    get_recommendation_ids_for_movies(path, "ratings")
+    get_recommendation_ids_for_movies(path, "watchlist")
+
+    with open("imdb/recommendations.csv", "w") as out:
+        for key, value in result_dict.items():
+            out.write(key+";"+"|".join(value)+"\n")
 
 
 if __name__ == '__main__':
@@ -149,6 +199,7 @@ if __name__ == '__main__':
     path = args.path
     watchlist_id = args.wlid
 
-    path = "C:\\Users\\MEichenseer\\Documents\\GitHub\\HookMeUpOnIMDb-Data"
+    path = "/home/michael-123/PyCharmProjects/HookMeUpOnIMDb-Data"
+    path = "/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data"
 
-    download_imdb_data(user, path, watchlist_id)
+    download_relationships_as_csv(path)

@@ -17,9 +17,11 @@ def log_me(message):
     if DO_LOG:
         print(message)
 
+
 def get_html_code_from_url(url):
     """ Gets you the HTML code of given URL. """
     return requests.get(url).text
+
 
 def get_ids_from_top_250():
     """ Gets you the ids from the Top 250"""
@@ -47,7 +49,7 @@ def get_recommendation_ids_from_html_file(html_file):
 
         for rec in recs:
             href = rec.xpath("a/@href")[0]
-            id = href[7:-17]
+            id = href[7:16]
             result.append(id)
 
     return result
@@ -78,8 +80,11 @@ def write_html_file(path, file_name, html_code):
 def download_html_for_ids(download_ids, path, url):
     """ Downloads for a list of movie ids the html code and saves it to the local disk. """
     for download_id in download_ids:
-        html_code = get_html_code_from_url(url.format(download_id))
-        write_html_file(path, download_id, html_code)
+        if not os.path.isfile("{0]/{1}.html".format(path, download_id)):
+            html_code = get_html_code_from_url(url.format(download_id))
+            write_html_file(path, download_id, html_code)
+        else:
+            log_me("Download {0} skipped. Already there.".format(download_id))
 
 
 def download_soundtrack_for_ids(id_list, to_path):
@@ -108,7 +113,7 @@ def save_ids_as_csv(id_list, to_path):
     os.makedirs(os.path.dirname(to_path), exist_ok=True)
     with open(to_path, "w") as out:
         for id in id_list:
-            out.write("{0}\n".format(id))
+            out.write("{0},\n".format(id))
 
 
 def main():

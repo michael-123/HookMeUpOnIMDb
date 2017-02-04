@@ -17,6 +17,9 @@ def log_me(message):
     if DO_LOG:
         print(message)
 
+def get_html_code_from_path(path):
+    with open(path, "r", encoding="utf8") as f:
+        return f.read()
 
 def get_html_code_from_url(url):
     """ Gets you the HTML code of given URL. """
@@ -61,7 +64,7 @@ def get_ids_from_csv_file(csv_path, column=1):
     with open(csv_path, 'r') as file:
         rows = csv.reader(file, delimiter=',', quotechar='"')
         for row in rows:
-            if row.startswith('tt'):
+            if row[column].startswith('tt'):
                 result.append(row[column])
     return result
 
@@ -80,7 +83,7 @@ def write_html_file(path, file_name, html_code):
 def download_html_for_ids(download_ids, path, url):
     """ Downloads for a list of movie ids the html code and saves it to the local disk. """
     for download_id in download_ids:
-        if not os.path.isfile("{0]/{1}.html".format(path, download_id)):
+        if not os.path.isfile("{0}/{1}.html".format(path, download_id)):
             html_code = get_html_code_from_url(url.format(download_id))
             write_html_file(path, download_id, html_code)
         else:
@@ -118,6 +121,7 @@ def save_ids_as_csv(id_list, to_path):
 
 def main():
     """ Do what you want to do. """
+    pass
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
-from hook_me_up_on_imdb import download_html_for_ids
-from hook_me_up_on_imdb import URLS
-from hook_me_up_on_imdb import get_html_code_from_path
+from util import download_html_for_ids
+from util import URLS
+from util import get_html_code_from_path
 from lxml import html
 
 
@@ -77,6 +77,9 @@ class Movie:
             return result
         except:
             return None
+
+    def to_csv_line(self):
+        return 'asdf,\r'
 
 
 if __name__ == '__main__':

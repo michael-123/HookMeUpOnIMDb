@@ -17,9 +17,17 @@ def log_me(message):
     if DO_LOG:
         print(message)
 
+
+def save_to_file(list_of_lists, to_file):
+    with open(to_file, 'w+') as out:
+        for entry in list_of_lists:
+            out.write(str(entry).replace('[', '').replace(']', '')+',\r')
+
+
 def get_html_code_from_path(path):
     with open(path, "r", encoding="utf8") as f:
         return f.read()
+
 
 def get_html_code_from_url(url):
     """ Gets you the HTML code of given URL. """
@@ -66,6 +74,28 @@ def get_ids_from_csv_file(csv_path, column=1):
         for row in rows:
             if row[column].startswith('tt'):
                 result.append(row[column])
+    return result
+
+
+def get_ratings_from_csv_file(csv_path):
+    """Returns a list of movie id, ratings and movie title."""
+    result = list()
+    with open(csv_path, 'r') as file:
+        rows = csv.reader(file, delimiter=',', quotechar='"')
+        for row in rows:
+            if row[1].startswith('tt'):
+                result.append([row[1], row[8], row[5]])
+    return result
+
+
+def get_watchlist_from_csv_file(csv_path):
+    """Returns a list of movie id and movie title."""
+    result = list()
+    with open(csv_path, 'r') as file:
+        rows = csv.reader(file, delimiter=',', quotechar='"')
+        for row in rows:
+            if row[1].startswith('tt'):
+                result.append([row[1], row[5]])
     return result
 
 

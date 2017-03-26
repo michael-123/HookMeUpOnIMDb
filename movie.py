@@ -3,161 +3,156 @@ from util import URLS
 from util import get_html_code_from_path
 from lxml import html
 
-
-class Movie:
-    def __init__(self, movie_id, path_movies, path_ratings=None):
-        self.__path_movies = path_movies
-        try:
-            html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, movie_id))
-        except:
-            download_html_for_ids([movie_id], path_movies, URLS["movies"].format(movie_id))
-            html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, movie_id))
-
-        self.__tree = html.fromstring(html_code)
-        self.__id = movie_id
-        self.__path = path_movies
-        self.__set_data()
-
-    def __set_data(self):
-        """ Sets data from HTML file. """
-        self.title = self.fetch_title()
-        self.year = self.fetch_year()
-        self.rating = self.fetch_rating()
-        self.number_of_ratings = self.fetch_number_ratings()
-        self.genres = self.fetch_genre()
-        self.countries = self.fetch_countries()
-        self.duration = self.fetch_duration()
-        self.content_rating = self.fetch_content_rating()
-        self.description = self.fetch_description()
-        self.metascore = self.fetch_metascore()
-        self.storyline = self.fetch_storyline()
-        self.keywords = self.fetch_keywords()
-        self.number_of_critics = self.fetch_number_of_critics()
-        self.number_of_user_reviews = self.fetch_number_of_user_reviews()
+class API():
 
     def fetch_title(self):
-        """ Returns title of the movie. """
         try:
-            return self.__tree.xpath('//div[@class="title_wrapper"][1]/h1')[0].text
+            self.title = self.get_tree().xpath('//div[@class="title_wrapper"][1]/h1')[0].text
         except:
-            return None
+            pass
 
     def fetch_year(self):
-        """ Returns year of the movie. """
         try:
-            spans = self.__tree.xpath('//span[@id="titleYear"]')
+            spans = self.get_tree().xpath('//span[@id="titleYear"]')
             year = spans[0].xpath('a')[0].text
-            return int(year)
+            self.year =  int(year)
         except:
-            return None
+            pass
 
     def fetch_rating(self):
-        """ Returns the IMDb rating. """
         try:
-            rating = self.__tree.xpath('//span[@itemprop="ratingValue"]')[0].text
-            return float(rating)
+            rating = self.get_tree().xpath('//span[@itemprop="ratingValue"]')[0].text
+            self.rating = float(rating)
         except:
-            return None
+            pass
 
-    def fetch_number_ratings(self):
-        """ Returns the number of ratings. """
+    def fetch_number_of_ratings(self):
         try:
-            number = self.__tree.xpath('//span[@itemprop="ratingCount"]')[0].text
-            return int(number.replace(",", ""))
+            number = self.get_tree().xpath('//span[@itemprop="ratingCount"]')[0].text
+            self.number_of_ratings = int(number.replace(",", ""))
         except:
-            return None
+            pass
 
     def fetch_genre(self):
-        """ Returns list of genres of the movie. """
         try:
             result = list()
-            genres = self.__tree.xpath('//span[@itemprop="genre"]')
+            genres = self.get_tree().xpath('//span[@itemprop="genre"]')
             for genre in genres:
                 result.append(genre.text)
             return result
         except:
-            return None
+            pass
 
     def fetch_countries(self):
         try:
             result = list()
-            countries = self.__tree.xpath('//div[@id="titleDetails"][1]/div[@class="txt-block"][1]/a')
+            countries = self.get_tree().xpath('//div[@id="titleDetails"][1]/div[@class="txt-block"][1]/a')
             for country in countries:
                 result.append(country.text)
             return result
         except:
-            return None
+            pass
 
     def fetch_duration(self):
         try:
-            duration = self.__tree.xpath('//time[@itemprop="duration"]')[0].text
+            duration = self.get_tree().xpath('//time[@itemprop="duration"]')[0].text
             hours = duration.strip().split(" ")[0].replace("h", "")
             minutes = duration.strip().split(" ")[1].replace("min", "")
-            return float(hours) * 60.0 + float(minutes)
+            self.duration =  float(hours) * 60.0 + float(minutes)
         except:
-            return None
+            pass
 
     def fetch_content_rating(self):
         try:
-            content_rating = self.__tree.xpath('//meta[@itemprop="contentRating"]')[0].text
-            return content_rating
+            self.content_rating = self.get_tree().xpath('//meta[@itemprop="contentRating"]')[0].text
         except:
-            return None
+            pass
 
     def fetch_description(self):
         try:
-            description = self.__tree.xpath('//div[@itemprop="description"]')[0].text
-            return description
+            self.description = self.get_tree().xpath('//div[@itemprop="description"]')[0].text
         except:
-            return None
+            pass
 
     def fetch_metascore(self):
         try:
-            metascore = self.__tree.xpath('//div[contains(@class, "metacriticScore")]/span')[0].text
-            return float(metascore)
-        except Exception as e:
-            return None
+            metascore = self.get_tree().xpath('//div[contains(@class, "metacriticScore")]/span')[0].text
+            self.metascore = float(metascore)
+        except:
+            pass
 
     def fetch_storyline(self):
         try:
-            storyline = self.__tree.xpath('//div[@id="titleStoryLine"]//div[@itemprop="description"]')[0].text
-            return storyline
+            self.storyline = self.get_tree().xpath('//div[@id="titleStoryLine"]//div[@itemprop="description"]')[0].text
         except:
-            return None
+            pass
 
     def fetch_keywords(self):
         try:
-            xpath_keywords = self.__tree.xpath('//span[@itemprop="keywords"]')
+            xpath_keywords = self.get_tree().xpath('//span[@itemprop="keywords"]')
             keywords = [keyword.text for keyword in xpath_keywords]
             return ",".join(keywords)
         except:
-            return None
+            pass
 
     def fetch_number_of_critics(self):
         try:
-            links = self.__tree.xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
-            return int(links[1].text.replace(" critic", "").replace(",", ""))
+            links = self.get_tree().xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
+            self.number_of_critics = int(links[1].text.replace(" critic", "").replace(",", ""))
         except:
-            return None
+            pass
 
     def fetch_number_of_user_reviews(self):
         try:
-            links = self.__tree.xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
-            return int(links[0].text.replace(" user", "").replace(",", ""))
+            links = self.get_tree().xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
+            self.number_of_user_review =  int(links[0].text.replace(" user", "").replace(",", ""))
         except:
-            return None
+            pass
 
 
+class Movie(API):
+    attributes = [
+        # imdb_id already set in __init__(),
+        'title',
+        'year',
+        'rating',
+        'number_of_ratings',
+#        'genres',
+#        'countries',
+        'duration',
+        'content_rating',
+        'description',
+        'metascore',
+        'storyline',
+#        'keywords',
+        'number_of_critics',
+        'number_of_user_reviews',  
+    ]
 
-    def save(self):
-        return 'asdf,\r'
+    def get_tree(self):
+        return self.__tree
 
+    def __set_data(self):
+        for attribute in self.attributes:
+            getattr(self, 'fetch_{}'.format(attribute))()
+            
+    def __init__(self, imdb_id, path_movies, path_ratings=None):
+        try:
+            html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, imdb_id))
+        except:
+            download_html_for_ids([movie_id], path_movies, URLS["movies"].format(imdb_id))
+            html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, imdb_id))
 
+        self.__tree = html.fromstring(html_code)
+        self.__path = path_movies
+        self.__path_movies = path_movies
+
+        # Set IMDb data
+        self.imdb_id = imdb_id
+        self.__set_data()
+
+    
 if __name__ == '__main__':
     movie = Movie("tt5974402", "/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data/movies", "")
-    print(movie.title)
-    print(movie.year)
-    print(movie.rating)
-    print(movie.number_of_ratings)
-    print(movie.genres)
-    print(movie.countries)
+    for attribute in movie.attributes:
+        print(getattr(movie, attribute))

@@ -3,19 +3,7 @@ import csv
 import requests
 from lxml import html
 
-URLS = {
-    "movies": "http://www.imdb.com/title/{0}/",
-    "soundtrack": "http://www.imdb.com/title/{0}/soundtrack",
-    "top250": "http://www.imdb.com/chart/top"
-}
 
-DO_LOG = True
-
-
-def log_me(message):
-    """ Log functionality """
-    if DO_LOG:
-        print(message)
 
 
 def save_to_file(list_of_lists, to_file):

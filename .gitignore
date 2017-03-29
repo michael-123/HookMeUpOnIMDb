@@ -2,3 +2,5 @@
 __pychache__
 *.swp
 *.swo
+settings.py
+*.pyc

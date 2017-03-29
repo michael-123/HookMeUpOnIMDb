@@ -38,21 +38,20 @@ def save_csv_from_watchlist(csv, user_name, out_file_name=CSV_WATCHLIST):
 def save_csv_for_recommendations_from_ids(ids):
     result = []
     with open(CSV_RECOMMENDATIONS, 'w+') as out:
-        for movie_id in ids:
-            recommendation_ids = get_recommendation_ids_from_html_file('{}/{}.html'.format(MOVIE_HTML_DIR, movie_id))
+        for imdb_id in ids:
+            recommendation_ids = get_recommendation_ids_from_html_file('{}/{}.html'.format(MOVIE_HTML_DIR, imdb_id))
             result.extend(recommendation_ids)
             for recommendation_id in recommendation_ids:
-                out.write('{},{},\r'.format(movie_id, recommendation_id))
+                out.write('{},{},\r'.format(imdb_id, recommendation_id))
     return list(set(result))
 
 
 def save_movie_information_csv_files(ids, html_dir):
     # for all ids load movie html and create csv
     with open(CSV_MOVIES, 'w+') as out:
-        for id in ids:
-            log("Fetch movie information for movie id {}.".format(id))
-            movie = Movie(id, html_dir)
-            print(movie.title)
+        for imdb_id in ids:
+            log("Fetch movie information for movie id {}.".format(imdb_id))
+            movie = Movie(imdb_id, html_dir)
             # TODO save all csv files
 
 

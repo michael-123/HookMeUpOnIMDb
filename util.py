@@ -95,7 +95,7 @@ def write_html_file(path, file_name, html_code):
         with open(out, "x", encoding="utf8") as file:
             file.write(html_code)
     except FileExistsError:
-        log_me("{0} skipped. Already there.".format(out))
+        log("{0} skipped. Already there.".format(out))
 
 
 def download_html_for_ids(download_ids, path, url):
@@ -105,18 +105,18 @@ def download_html_for_ids(download_ids, path, url):
             html_code = get_html_code_from_url(url.format(download_id))
             write_html_file(path, download_id, html_code)
         else:
-            log_me("Download {0} skipped. Already there.".format(download_id))
+            log("Download {0} skipped. Already there.".format(download_id))
 
 
 def download_soundtrack_for_ids(id_list, to_path):
     """ Downloading soundtracks with given ids to path. """
-    log_me("Downloading {0} soundtracks.".format(len(id_list)))
+    log("Downloading {0} soundtracks.".format(len(id_list)))
     download_html_for_ids(id_list, to_path, URLS["soundtrack"])
 
 
 def download_movies_for_ids(id_list, to_path):
     """ Downloading movies with given ids to path. """
-    log_me("Downloading {0} movies.".format(len(id_list)))
+    log("Downloading {0} movies.".format(len(id_list)))
     download_html_for_ids(id_list, to_path, URLS["movies"])
 
 
@@ -125,7 +125,7 @@ def get_all_ids_from_directory(from_path):
     result = list()
     for file in os.listdir(from_path):
         result.append(file[:-5])
-    log_me("{0} ids found.".format(len(result)))
+    log("{0} ids found.".format(len(result)))
     return result
 
 

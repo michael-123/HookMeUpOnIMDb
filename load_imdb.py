@@ -4,9 +4,10 @@ from util import save_to_file
 from util import download_html_for_ids
 from util import get_recommendation_ids_from_html_file
 from util import download_soundtrack_for_ids
+from util import log
+from util import URLS
 
-from movie import Movie
-
+from settings import CSV_DIR
 from settings import CSV_MOVIES
 from settings import CSV_RATINGS
 from settings import CSV_RECOMMENDATIONS
@@ -16,19 +17,8 @@ from settings import SOUNDTRACK_HTML_DIR
 from settings import IMDB_USER_ID
 from settings import RATINGS_FILE_PATH
 from settings import WATCHLIST_FILE_PATH
-from settings import DO_LOG
 
-URLS = {
-    "movies": "http://www.imdb.com/title/{0}/",
-    "soundtrack": "http://www.imdb.com/title/{0}/soundtrack",
-    "top250": "http://www.imdb.com/chart/top"
-}
-
-
-def log(message):
-    """ Log functionality """
-    if DO_LOG:
-        print(message)
+from movie import Movie
 
 
 def save_csv_from_ratings(csv, user_name, out_file_name=CSV_RATINGS):

@@ -3,6 +3,8 @@ from util import URLS
 from util import get_html_code_from_path
 from lxml import html
 
+from settings import *
+
 class API():
 
     def fetch_title(self):

@@ -55,7 +55,19 @@ def save_movie_information_csv_files(ids, html_dir):
             # TODO save all csv files
 
 
+def init_csv_files():
+    import os
+    print("Clean {}.".format(CSV_DIR))
+    for file_name in os.listdir(CSV_DIR):
+        file_path = os.path.join(CSV_DIR, file_name)
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+
+
 def main():
+    # Init CSV files
+    init_csv_files()
+
     # Create ratings table
     rating_ids = save_csv_from_ratings(RATINGS_FILE_PATH, IMDB_USER_ID)
 

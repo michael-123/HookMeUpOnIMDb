@@ -35,25 +35,20 @@ class API():
         except:
             pass
 
-    def fetch_genre(self):
+    def fetch_genres(self):
         try:
-            result = list()
-            genres = self.get_tree().xpath('//span[@itemprop="genre"]')
-            for genre in genres:
-                result.append(genre.text)
-            return result
+            with open(CSV_GENRES, 'a') as genre_out:
+                genres = self.get_tree().xpath('//span[@itemprop="genre"]')
+                for genre in genres:
+                    genre_out.write("{},{}\r".format(self.imdb_id, genre.text))
         except:
             pass
 
     def fetch_countries(self):
-        try:
-            result = list()
+        with open(CSV_COUNTRIES, 'a') as countries_out:
             countries = self.get_tree().xpath('//div[@id="titleDetails"][1]/div[@class="txt-block"][1]/a')
             for country in countries:
-                result.append(country.text)
-            return result
-        except:
-            pass
+                countries_out.write("{},{}\r".format(self.imdb_id, country.text))
 
     def fetch_duration(self):
         try:
@@ -72,7 +67,8 @@ class API():
 
     def fetch_description(self):
         try:
-            self.description = self.get_tree().xpath('//div[@itemprop="description"]')[0].text
+            description = self.get_tree().xpath('//div[@itemprop="description"]')[0].text
+            self.description = description.strip().replace("\n", "").replace("\r", "")
         except:
             pass
 
@@ -91,9 +87,11 @@ class API():
 
     def fetch_keywords(self):
         try:
-            xpath_keywords = self.get_tree().xpath('//span[@itemprop="keywords"]')
-            keywords = [keyword.text for keyword in xpath_keywords]
-            return ",".join(keywords)
+            with open(CSV_KEYWORDS, 'a') as keywords_out:
+                xpath_keywords = self.get_tree().xpath('//span[@itemprop="keywords"]')
+                keywords = [keyword.text for keyword in xpath_keywords]
+                for keyword in keywords:
+                    keywords_out.write("{},{}\r".format(self.imdb_id, keyword))
         except:
             pass
 
@@ -111,6 +109,11 @@ class API():
         except:
             pass
 
+    def fetch_release_date_us(self):
+        dates = self.get_tree().xpath('//meta[@itemprop="datePublished"]')
+        if len(dates) > 0:
+            self.release_date_us = dates[0].attrib['content']
+
 
 class Movie(API):
     attributes = [
@@ -119,16 +122,17 @@ class Movie(API):
         'year',
         'rating',
         'number_of_ratings',
-#        'genres',
-#        'countries',
+        'genres',
+        'countries',
         'duration',
         'content_rating',
         'description',
         'metascore',
         'storyline',
-#        'keywords',
+        'keywords',
         'number_of_critics',
-        'number_of_user_reviews',  
+        'number_of_user_reviews',
+        'release_date_us',
     ]
 
     def get_tree(self):
@@ -137,7 +141,17 @@ class Movie(API):
     def __set_data(self):
         for attribute in self.attributes:
             getattr(self, 'fetch_{}'.format(attribute))()
-            
+
+    def csv(self):
+        result = list()
+        for attribute in self.attributes:
+            try:
+                result.append(getattr(self, attribute))
+            except AttributeError as e:
+                pass
+        print(result)
+        return "{}\r".format(",".join(str(item) for item in result))
+
     def __init__(self, imdb_id, path_movies, path_ratings=None):
         try:
             html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, imdb_id))
@@ -152,6 +166,9 @@ class Movie(API):
         # Set IMDb data
         self.imdb_id = imdb_id
         self.__set_data()
+
+        with open(CSV_MOVIES, 'a') as movies_out:
+            movies_out.write(self.csv())
 
     
 if __name__ == '__main__':

@@ -2,14 +2,25 @@ import os
 import csv
 import requests
 from lxml import html
+from settings import DO_LOG
+
+URLS = {
+    "movies": "http://www.imdb.com/title/{0}/",
+    "soundtrack": "http://www.imdb.com/title/{0}/soundtrack",
+    "top250": "http://www.imdb.com/chart/top"
+}
 
 
+def log(message):
+    """ Log functionality """
+    if DO_LOG:
+        print(message)
 
 
 def save_to_file(list_of_lists, to_file):
     with open(to_file, 'w+') as out:
         for entry in list_of_lists:
-            out.write(str(entry).replace('[', '').replace(']', '')+',\r')
+            out.write(str(entry).replace('[', '').replace(']', '') + ',\r')
 
 
 def get_html_code_from_path(path):

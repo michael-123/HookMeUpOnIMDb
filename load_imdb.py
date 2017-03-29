@@ -14,14 +14,14 @@ MOVIE_HTML_DIR = '/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data/movies/'
 SOUNDTRACK_HTML_DIR = '/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data/soundtracks'
 
 
-def save_csv_from_ratings(csv, user_name, out_file_name='my_ratings.csv'):
+def save_csv_from_ratings(csv, user_name, out_file_name='ratings.csv'):
     log("Create CSV file {} for user {}.".format(out_file_name, user_name))
     ratings = get_ratings_from_csv_file(csv, user_name)
     save_to_file(ratings, CSV_DIR + out_file_name)
     return [i[0] for i in ratings]
 
 
-def save_csv_from_watchlist(csv, user_name, out_file_name='watchlist.csv'):
+def save_csv_from_watchlist(csv, user_name, out_file_name='watches.csv'):
     log("Create watchlist file {} for user {}.".format(out_file_name, user_name))
     watchlist = get_watchlist_from_csv_file(csv, user_name)
     save_to_file(watchlist, CSV_DIR + out_file_name)

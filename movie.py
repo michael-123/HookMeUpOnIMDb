@@ -140,7 +140,7 @@ class Movie(API):
         try:
             html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, imdb_id))
         except:
-            download_html_for_ids([movie_id], path_movies, URLS["movies"].format(imdb_id))
+            download_html_for_ids([imdb_id], path_movies, URLS["movies"].format(imdb_id))
             html_code = get_html_code_from_path("{0}/{1}.html".format(path_movies, imdb_id))
 
         self.__tree = html.fromstring(html_code)

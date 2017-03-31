@@ -12,7 +12,6 @@ URLS = {
 
 
 def log(message):
-    """ Log functionality """
     if DO_LOG:
         print(message)
 
@@ -29,12 +28,10 @@ def get_html_code_from_path(path):
 
 
 def get_html_code_from_url(url):
-    """ Gets you the HTML code of given URL. """
     return requests.get(url).text
 
 
 def get_ids_from_top_250():
-    """ Gets you the ids from the Top 250"""
     result = list()
     html_code = get_html_code_from_url(URLS["top250"])
     tree = html.fromstring(html_code)
@@ -49,24 +46,19 @@ def get_ids_from_top_250():
 
 
 def get_recommendation_ids_from_html_file(html_file):
-    """ Gets you all movie ids for a movie's (html_file) recommendations. """
     result = list()
-
     with open(html_file, "r", encoding="utf8") as f:
         html_code = f.read()
         tree = html.fromstring(html_code)
         recs = tree.xpath('//div[@class="rec_item"]')
-
         for rec in recs:
             href = rec.xpath("a/@href")[0]
             id = href[7:16]
             result.append(id)
-
     return result
 
 
 def get_ids_from_csv_file(csv_path, column=1):
-    """ Gets you all movie ids from a CSV file at csv_path. """
     result = list()
     with open(csv_path, 'r') as file:
         rows = csv.reader(file, delimiter=',', quotechar='"')
@@ -77,7 +69,6 @@ def get_ids_from_csv_file(csv_path, column=1):
 
 
 def get_ratings_from_csv_file(csv_path, user_name):
-    """Returns a list of movie id, ratings and movie title."""
     result = list()
     with open(csv_path, 'r') as file:
         rows = csv.reader(file, delimiter=',', quotechar='"')
@@ -88,7 +79,6 @@ def get_ratings_from_csv_file(csv_path, user_name):
 
 
 def get_watchlist_from_csv_file(csv_path, user_name):
-    """Returns a list of movie id and movie title."""
     result = list()
     with open(csv_path, 'r') as file:
         rows = csv.reader(file, delimiter=',', quotechar='"')
@@ -99,7 +89,6 @@ def get_watchlist_from_csv_file(csv_path, user_name):
 
 
 def write_html_file(path, file_name, html_code):
-    """ Writes html file """
     os.makedirs(path, exist_ok=True)
     out = "{0}/{1}.html".format(path, file_name)
     try:
@@ -109,30 +98,26 @@ def write_html_file(path, file_name, html_code):
         log("{0} skipped. Already there.".format(out))
 
 
-def download_html_for_ids(download_ids, path, url):
-    """ Downloads for a list of movie ids the html code and saves it to the local disk. """
-    for download_id in download_ids:
-        if not os.path.isfile("{0}/{1}.html".format(path, download_id)):
+def download_html_for_ids(ids_to_download, repository_path, url):
+    for download_id in ids_to_download:
+        if not os.path.isfile("{0}/{1}.html".format(repository_path, download_id)):
             html_code = get_html_code_from_url(url.format(download_id))
-            write_html_file(path, download_id, html_code)
+            write_html_file(repository_path, download_id, html_code)
         else:
             log("Download {0} skipped. Already there.".format(download_id))
 
 
 def download_soundtrack_for_ids(id_list, to_path):
-    """ Downloading soundtracks with given ids to path. """
     log("Downloading {0} soundtracks.".format(len(id_list)))
     download_html_for_ids(id_list, to_path, URLS["soundtrack"])
 
 
 def download_movies_for_ids(id_list, to_path):
-    """ Downloading movies with given ids to path. """
     log("Downloading {0} movies.".format(len(id_list)))
     download_html_for_ids(id_list, to_path, URLS["movies"])
 
 
 def get_all_ids_from_directory(from_path):
-    """ Gets you all ids from a given directory. """
     result = list()
     for file in os.listdir(from_path):
         result.append(file[:-5])
@@ -141,7 +126,6 @@ def get_all_ids_from_directory(from_path):
 
 
 def save_ids_as_csv(id_list, to_path):
-    """ Saves a list of ids to a CSV file. """
     os.makedirs(os.path.dirname(to_path), exist_ok=True)
     with open(to_path, "w") as out:
         for id in id_list:
@@ -149,7 +133,6 @@ def save_ids_as_csv(id_list, to_path):
 
 
 def main():
-    """ Do what you want to do. """
     pass
 
 

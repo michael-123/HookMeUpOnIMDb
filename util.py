@@ -74,7 +74,7 @@ def get_ratings_from_csv_file(csv_path, user_name):
         rows = csv.reader(file, delimiter=',', quotechar='"')
         for row in rows:
             if row[1].startswith('tt'):
-                result.append([row[1], row[8], row[5], user_name])
+                result.append([row[1], row[8], row[5], user_name, row[2]])
     return result
 
 

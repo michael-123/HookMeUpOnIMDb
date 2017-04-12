@@ -8,106 +8,91 @@ from settings import *
 
 class API(object):
     def fetch_title(self):
-        self.title = self.get_tree().xpath('//div[@class="title_wrapper"][1]/h1/text()[1]')
+        xpath = '//div[@class="title_wrapper"][1]/h1/text()[1]'
+        title = self.get_tree().xpath(xpath)[0]
+        self.title = title.replace("\r", "").replace("\n", "").strip()
 
     def fetch_year(self):
-        year = self.get_tree().xpath('//span[@id="titleYear"][1]/a/text()')
+        xpath = '//span[@id="titleYear"][1]/a/text()'
+        year = self.get_tree().xpath(xpath)[0]
         self.year = year
 
     def fetch_rating(self):
-        rating = self.get_tree().xpath('//span[@itemprop="ratingValue"][1]/text()')
-        self.rating = rating
+        xpath = '//span[@itemprop="ratingValue"][1]/text()'
+        rating = self.get_tree().xpath(xpath)[0]
+        self.rating = rating.replace(",", ".")
 
     def fetch_number_of_ratings(self):
-        number = self.get_tree().xpath('//span[@itemprop="ratingCount"][1]/text()')
-        self.number_of_ratings = number.replace(",", "").replace(".", "")
+        xpath = '//span[@itemprop="ratingCount"][1]/text()'
+        number = self.get_tree().xpath(xpath)[0]
+        self.number_of_ratings = number.replace(",", "").replace(".", "").strip()
 
     def fetch_genres(self):
-        genres = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Genres:")]/following-sibling::a/text()')
+        xpath = '//h4[@class="inline"][contains(text(), "Genres:")]/following-sibling::a/text()'
+        genres = self.get_tree().xpath(xpath)
         self.genres = [genre.strip() for genre in genres]
-        """
-        try:
-            with open(CSV_GENRES, 'a') as genre_out:
-                genres = self.get_tree().xpath('//span[@itemprop="genre"]')
-                for genre in genres:
-                    genre_out.write("{},{}\r".format(self.imdb_id, genre.text))
-        except:
-            pass
-        """
 
     def fetch_countries(self):
-        countries = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Country:")]/following-sibling::a/text()')
+        xpath = '//h4[@class="inline"][contains(text(), "Country:")]/following-sibling::a/text()'
+        countries = self.get_tree().xpath(xpath)
         self.countries = countries
-        """
-        with open(CSV_COUNTRIES, 'a') as countries_out:
-            countries = self.get_tree().xpath('//div[@id="titleDetails"][1]/div[@class="txt-block"][1]/a')
-            for country in countries:
-                countries_out.write("{},{}\r".format(self.imdb_id, country.text))
-        """
 
     def fetch_duration(self):
-        duration = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Runtime:")]/following-sibling::time/text()')
+        xpath = '//h4[@class="inline"][contains(text(), "Runtime:")]/following-sibling::time/text()'
+        duration = self.get_tree().xpath(xpath)[0]
         self.duration = duration.replace("min", "").strip()
 
     def fetch_content_rating(self):
-        self.content_rating = self.get_tree().xpath('//meta[@itemprop="contentRating"]/@content')
+        xpath = '//meta[@itemprop="contentRating"]/@content'
+        self.content_rating = self.get_tree().xpath(xpath)[0]
 
     def fetch_description(self):
-        description = self.get_tree().xpath('//div[@itemprop="description"]/p/text()')
+        xpath = '//div[@itemprop="description"]/p/text()'
+        description = self.get_tree().xpath(xpath)[0]
         self.description = description.strip().replace("\n", "").replace("\r", "")
 
     def fetch_metascore(self):
-        metascore = self.get_tree().xpath('//div[contains(@class, "metacriticScore")]/span/text()')
+        xpath = '//div[contains(@class, "metacriticScore")]/span/text()'
+        metascore = self.get_tree().xpath(xpath)[0]
         self.metascore = metascore
 
     def fetch_keywords(self):
-        keywords = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Plot Keywords:")]/following-sibling::a/span/text()')
+        xpath = '//h4[@class="inline"][contains(text(), "Plot Keywords:")]/following-sibling::a/span/text()'
+        keywords = self.get_tree().xpath(xpath)
         self.keywords = keywords
-        """
-        try:
-            with open(CSV_KEYWORDS, 'a') as keywords_out:
-                xpath_keywords = self.get_tree().xpath('//span[@itemprop="keywords"]')
-                keywords = [keyword.text for keyword in xpath_keywords]
-                for keyword in keywords:
-                    keywords_out.write("{},{}\r".format(self.imdb_id, keyword))
-        except:
-            pass
-        """
 
     def fetch_number_of_critics(self):
-        try:
-            links = self.get_tree().xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
-            self.number_of_critics = int(links[1].text.replace(" critic", "").replace(",", ""))
-        except:
-            pass
+        xpath = '//div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a/text()[contains(., "critic")]'
+        critics = self.get_tree().xpath(xpath)[0]
+        self.number_of_critics = critics.replace(" critic", "").replace(",", "").strip()
 
     def fetch_number_of_user_reviews(self):
-        try:
-            links = self.get_tree().xpath('// div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a')
-            self.number_of_user_review = int(links[0].text.replace(" user", "").replace(",", ""))
-        except:
-            pass
+        xpath = '//div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a/text()[contains(., "user")]'
+        user_reviews = self.get_tree().xpath(xpath)[0]
+        self.number_of_user_reviews = user_reviews.replace(" user", "").replace(",", "").strip()
 
     def fetch_release_date_us(self):
-        release_date_us = self.get_tree().xpath('//div[@class="title_wrapper"]//meta[@itemprop="datePublished"]/@content[1]')
-        self.release_date_us = release_date_us
+        xpath = '//div[@class="title_wrapper"][1]//meta[@itemprop="datePublished"][1]/@content[1]'
+        release_date_us = self.get_tree().xpath(xpath)
+        self.release_date_us = release_date_us[0]
 
     def fetch_languages(self):
-        languages = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Language:")]/following-sibling::a/text()')
+        xpath = '//h4[@class="inline"][contains(text(), "Language:")]/following-sibling::a/text()'
+        languages = self.get_tree().xpath(xpath)
         self.languages = languages
 
     def fetch_budget(self):
-        budget = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Budget:")]/following-sibling::text()[1][contains(., "$")]')
+        xpath = '//h4[@class="inline"][contains(text(), "Budget:")]/following-sibling::text()[contains(., "$")][1]'
+        budget = self.get_tree().xpath(xpath)
         self.budget = budget[0].replace("$", "").replace(".", "").replace(",", "").strip()
 
     def fetch_opening_weekend(self):
         opening_weekend = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Opening Weekend:")]/following-sibling::text()[1][contains(., "$")]')
-        self.opening_weekend = opening_weekend[0].replace("$", "").replace(".", "").replace(",", "").strip()
+        self.opening_weekend = opening_weekend[0].replace("$", "").replace(".", "").replace(",", "").replace("(USA)", "").strip()
 
     def fetch_gross(self):
         gross = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Gross:")]/following-sibling::text()[1][contains(., "$")]')
         self.gross = gross[0].replace("$", "").replace(".", "").replace(",", "").strip()
-
     def fetch_aspect_ratio(self):
         aspect_ratio = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Aspect Ratio:")]/following-sibling::text()[1][contains(., ":")]')
         self.aspect_ratio = aspect_ratio[0].strip()
@@ -134,10 +119,10 @@ class Movie(API):
         'opening_weekend',
         'gross',
         'aspect_ratio',
-        'actors',
-        'writers',
-        'directors',
-        'production_companies'
+        #'actors',  # TODO
+        #'writers',  # TODO
+        #'directors',  # TODO
+        #'production_companies'  # TODO
     ]
 
     def get_tree(self):
@@ -170,13 +155,13 @@ class Movie(API):
 
         # Set IMDb data
         self.imdb_id = imdb_id
-        #self.__set_data()
+        self.__set_data()
 
         with open(CSV_MOVIES, 'a') as movies_out:
             movies_out.write(self.csv())
 
 
 if __name__ == '__main__':
-    movie = Movie("tt5974402", "/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data/movies", "")
+    movie = Movie("tt4226388", "/home/michael-123/PycharmProjects/HookMeUpOnIMDb-Data/movies", "")
     for attribute in movie.attributes:
         print(getattr(movie, attribute))

@@ -93,9 +93,11 @@ class API(object):
     def fetch_gross(self):
         gross = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Gross:")]/following-sibling::text()[1][contains(., "$")]')
         self.gross = gross[0].replace("$", "").replace(".", "").replace(",", "").strip()
+
     def fetch_aspect_ratio(self):
         aspect_ratio = self.get_tree().xpath('//h4[@class="inline"][contains(text(), "Aspect Ratio:")]/following-sibling::text()[1][contains(., ":")]')
         self.aspect_ratio = aspect_ratio[0].strip()
+
 
 class Movie(API):
     attributes = [

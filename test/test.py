@@ -1,2 +1,0 @@
-class TestApi(object):
-    pass

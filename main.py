@@ -33,6 +33,12 @@ class IMDbHTMLMixin(object):
         number = self.get_tree().xpath(xpath)[0]
         return int(number.replace(",", "").replace(".", "").strip())
 
+    def fetch_movie_or_show(self):
+        xpath = '//div[@class="bp_heading"]/text()'
+        s = self.get_tree().xpath(xpath)
+        return 'show' if 'Episode Guide' == s else 'movie'
+
+
     def fetch_genres(self):
         xpath = '//h4[@class="inline"][contains(text(), "Genres:")]/following-sibling::a/text()'
         genres = self.get_tree().xpath(xpath)
@@ -134,6 +140,7 @@ class Movie(IMDbHTMLMixin):
         self.number_of_critics = self.fetch_number_of_critics()
         self.languages = self.fetch_languages()
         self.budget = self.fetch_budget()
+        self.movie_or_show = self.fetch_movie_or_show()
 
 
 def retrieve_movie_id_and_rating_from_ratings_csv(csv_path):

@@ -154,10 +154,17 @@ def retrieve_movie_id_and_rating_from_ratings_csv(csv_path):
 
 
 def build_knowledge(path_to_ratings_csv):
-    movie_id_rating_tuples = retrieve_movie_id_and_rating_from_ratings_csv(path)
-    movies = [Movie(movie_id, rating) for movie_id, rating in movie_id_rating_tuples]
-    pass
+    movie_id_rating_tuples = retrieve_movie_id_and_rating_from_ratings_csv(path_to_ratings_csv)
+
+    movies = []
+    for index, t in enumerate(movie_id_rating_tuples, 1):
+        movie_id, rating = t
+        print("Processing {}/{}".format(index, len(movie_id_rating_tuples)))
+        movies.append(Movie(movie_id, rating))
+
+    for m in movies:
+        m.check()
 
 
 if __name__ == '__main__':
-    build_knowledge()
+    build_knowledge('data/ratings.csv')

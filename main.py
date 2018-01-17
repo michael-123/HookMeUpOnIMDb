@@ -17,7 +17,11 @@ class IMDbHTMLMixin(object):
 
     def fetch_year(self):
         xpath = '//span[@id="titleYear"][1]/a/text()'
-        return int(self.get_tree().xpath(xpath)[0])
+        try:
+            return int(self.get_tree().xpath(xpath)[0])
+        except IndexError:
+            print(self.movie_id, self.title, "has no year")
+            pass
 
     def fetch_rating(self):
         xpath = '//span[@itemprop="ratingValue"][1]/text()'
@@ -40,8 +44,11 @@ class IMDbHTMLMixin(object):
 
     def fetch_duration(self):
         xpath = '//h4[@class="inline"][contains(text(), "Runtime:")]/following-sibling::time/text()'
-        duration = self.get_tree().xpath(xpath)[0]
-        return int(duration.replace("min", "").strip())
+        try:
+            duration = self.get_tree().xpath(xpath)[0]
+            return int(duration.replace("min", "").strip())
+        except IndexError:
+            pass
 
     def fetch_content_rating(self):
         xpath = '//meta[@itemprop="contentRating"]/@content'
@@ -49,13 +56,19 @@ class IMDbHTMLMixin(object):
 
     def fetch_metascore(self):
         xpath = '//div[contains(@class, "metacriticScore")]/span/text()'
-        metascore = self.get_tree().xpath(xpath)[0]
-        return metascore
+        try:
+            metascore = self.get_tree().xpath(xpath)[0]
+            return metascore
+        except IndexError:
+            pass
 
     def fetch_number_of_critics(self):
         xpath = '//div[@class ="titleReviewBarItem titleReviewbarItemBorder"]//a/text()[contains(., "critic")]'
-        critics = self.get_tree().xpath(xpath)[0]
-        return int(critics.replace(" critic", "").replace(",", "").strip())
+        try:
+            critics = self.get_tree().xpath(xpath)[0]
+            return int(critics.replace(" critic", "").replace(",", "").strip())
+        except IndexError:
+            pass
 
     def fetch_languages(self):
         xpath = '//h4[@class="inline"][contains(text(), "Language:")]/following-sibling::a/text()'

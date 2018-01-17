@@ -103,18 +103,22 @@ class Movie(IMDbHTMLMixin):
         return self.__tree
 
     def check(self):
-        print('Title', self.title)
-        print('Year', self.year)
-        print('IMDB rating', self.imdb_rating)
-        print('User rating', self.user_rating)
-        print('Number of ratings', self.number_of_ratings)
-        print('Genres', self.genres)
-        print('Countries', self.countries)
-        print('Duration', self.duration)
-        print('Metascore', self.metascore)
-        print('Number of critics', self.number_of_critics)
-        print('Languages', self.languages)
-        print('Budget', self.budget)
+        from pprint import pprint
+        pprint({
+            'Title': self.title,
+            'Year': self.year,
+            'IMDB rating': self.imdb_rating,
+            'User rating': self.user_rating,
+            'Number of ratings': self.number_of_ratings,
+            'Genres': self.genres,
+            'Countries': self.countries,
+            'Duration': self.duration,
+            'Metascore': self.metascore,
+            'Number of critics': self.number_of_critics,
+            'Languages': self.languages,
+            'Budget': self.budget,
+            'Movie or Show': self.movie_or_show,
+        })
 
     def load_movie_attributes(self):
         # If HTML file is not there already

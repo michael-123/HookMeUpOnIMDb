@@ -1,9 +1,11 @@
 import os
 import requests
+import csv
 
 from lxml import html
 
-import settings
+
+DATA_FOLDER = 'data'
 
 
 class IMDbHTMLMixin(object):
@@ -63,14 +65,17 @@ class IMDbHTMLMixin(object):
     def fetch_budget(self):
         xpath = '//h4[@class="inline"][contains(text(), "Budget:")]/following-sibling::text()[contains(., "$")][1]'
         budget = self.get_tree().xpath(xpath)
-        budget = budget[0].replace("$", "").replace(".", "").replace(",", "").strip()
-        return int(budget)
+        try:
+            budget = budget[0].replace("$", "").replace(".", "").replace(",", "").strip()
+            return int(budget)
+        except IndexError:
+            pass
 
 
 class Movie(IMDbHTMLMixin):
 
     def __init__(self, movie_id, user_rating=None):
-        self.data_path = '{}/{}.html'.format(settings.DATA_FOLDER, movie_id)
+        self.data_path = '{}/{}.html'.format(DATA_FOLDER, movie_id)
         self.movie_id = movie_id
         self.user_rating = user_rating
         self.load_movie_attributes()
@@ -121,7 +126,7 @@ class Movie(IMDbHTMLMixin):
 def retrieve_movie_id_and_rating_from_ratings_csv(csv_path):
     with open(csv_path, 'r') as file:
         rows = csv.reader(file, delimiter=',', quotechar='"')
-        return [(r[1], int(r[8])) for r in rows if r[1].starts_with('tt')]
+        return [(r[1], int(r[8])) for r in rows if r[1].startswith('tt')]
 
 
 def build_knowledge(path_to_ratings_csv):
